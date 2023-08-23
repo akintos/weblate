@@ -46,6 +46,8 @@ from weblate.utils.errors import report_error
 
 SPLIT_RE = re.compile(r"[\s,.:!?]+", re.UNICODE)
 
+WORDS_EXCLUDE_SET = set(["le", "la", "the", "a", "an", "on", "of", "and", "in", "points", "damage", "level", "attack"])
+
 
 class GlossaryQuerySet(models.QuerySet):
     def for_project(self, project):
@@ -204,6 +206,8 @@ class TermQuerySet(models.QuerySet):
 
         if "" in words:
             words.remove("")
+
+        words = words - WORDS_EXCLUDE_SET
 
         if not words:
             # No extracted words, no glossary
