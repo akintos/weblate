@@ -83,6 +83,42 @@
                 return false;
             }
         );
+	    Mousetrap.bindGlobal(
+            'alt+q',
+            function(e) {
+                $('input[name="review"]').click();
+		        return submitForm(e);
+            }
+        );
+	    Mousetrap.bindGlobal(
+            'alt+e',
+            function(e) {
+                $('button[name="suggest"]').click();
+		        return false;
+            }
+        );
+	    Mousetrap.bindGlobal(
+            'alt+n',
+            () => {
+                var editor = this.$translationArea.get(0);
+                var prevText = editor.value.substr(0, editor.selectionStart);
+                var openCount = (prevText.match(/{n}/g) || []).length;
+                var closeCount = (prevText.match(/{\/n}/g) || []).length;
+                this.$translationArea.insertAtCaret(openCount > closeCount ? "{/n}" : "{n}").change()
+		        return false;
+            }
+        );
+	    Mousetrap.bindGlobal(
+            'alt+i',
+            () => {
+                var editor = this.$translationArea.get(0);
+                var prevText = editor.value.substr(0, editor.selectionStart);
+                var openCount = (prevText.match(/<i>/g) || []).length;
+                var closeCount = (prevText.match(/<\/i>/g) || []).length;
+                this.$translationArea.insertAtCaret(openCount > closeCount ? "</i>" : "<i>").change()
+		        return false;
+            }
+        );
     }
     FullEditor.prototype = Object.create(EditorBase.prototype);
     FullEditor.prototype.constructor = FullEditor;
