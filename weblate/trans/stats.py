@@ -36,6 +36,9 @@ def get_project_stats(project):
             "total_chars": tup.all_chars,
             "translated_chars": tup.translated_chars,
             "translated_chars_percent": tup.translated_chars_percent,
+            "approved": tup.approved,
+            "approved_words": tup.approved_words,
+            "approved_percent": tup.approved_percent,
         }
         for tup in project.stats.get_language_stats()
     ]

@@ -46,6 +46,9 @@ def export_stats_project(request, project):
             "total_chars",
             "translated_chars",
             "translated_chars_percent",
+            "approved",
+            "approved_percent",
+            "approved_words",
         ),
         get_project_stats(obj),
     )
