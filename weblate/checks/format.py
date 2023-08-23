@@ -171,6 +171,8 @@ PERCENT_MATCH = re.compile(r"(%([a-zA-Z0-9_]+)%)")
 
 WHITESPACE = re.compile(r"\s+")
 
+ENCYCLOPEDIA_MATCH = re.compile(r"{g\|Encyclopedia:[A-Za-z_]+}([^{]+){/g}")
+
 
 def c_format_is_position_based(string):
     return "$" not in string and string != "%"
@@ -193,6 +195,7 @@ FLAG_RULES = {
     "python-brace-format": (PYTHON_BRACE_MATCH, name_format_is_position_based),
     "c-sharp-format": (C_SHARP_MATCH, name_format_is_position_based),
     "java-format": (JAVA_MATCH, c_format_is_position_based),
+    "encyclopedia-tag": (ENCYCLOPEDIA_MATCH, name_format_is_position_based),
 }
 
 
@@ -494,3 +497,22 @@ class MultipleUnnamedFormatsCheck(SourceCheck):
                     if found >= 2:
                         return True
         return False
+
+
+class EncyclopediaTagCheck(BaseFormatCheck):
+    """Check for Python format string."""
+
+    check_id = "encyclopedia-tag"
+    name = "Encyclopedia tag"
+    description = "Encyclopedia check"
+    regexp = ENCYCLOPEDIA_MATCH
+
+    def is_position_based(self, string):
+        return name_format_is_position_based(string)
+
+    def format_string(self, string):
+        return "{%s}" % string
+
+    def check_target(self, sources, targets, unit):
+        return False
+
