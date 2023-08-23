@@ -149,7 +149,8 @@
             {% if unit.context %}
                 <div class="pull-right flip">
                 <label>{{ unit.translation.component.context_label }}</label>
-                {{ unit.context }}
+                {{ unit.context }}&nbsp;
+                <button type="button" class="btn btn-link btn-xs pull-right flip" data-clipboard-text="{{ unit.context }}" title="{% trans "Copy to clipboard" %}">{% icon "copy.svg" %}</button>
                 </div>
             {% endif %}
             <label>{{ unit.translation.component.project.source_language }}</label>
