@@ -491,11 +491,11 @@
 
 <div class="panel panel-default">
   <div class="panel-heading">
-  <h4 class="panel-title">
-    <a class="pull-right flip btn btn-link btn-xs" title="{% trans "Manage glossary" %}" href="{% url 'show_glossary' project=unit.translation.component.project.slug lang=unit.translation.language.code %}">{% icon "pencil.svg" %}</a>
-    {% loading_icon "glossary-add" %}
-    {% trans "Glossary" %}
-  </h4>
+    <h4 class="panel-title">
+      <a class="pull-right flip btn btn-link btn-xs" title="{% trans "Manage glossary" %}" href="{% url 'show_glossary' project=unit.translation.component.project.slug lang=unit.translation.language.code %}">{% icon "pencil.svg" %}</a>
+      {% loading_icon "glossary-add" %}
+      {% trans "Glossary" %}
+    </h4>
   </div>
     <table class="table table-condensed table-simple">
         <thead>
@@ -536,6 +536,22 @@
 {% endif %}
 </div>
 
+{% if unit.note and unit|is_bg3_dialog %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h4 class="panel-title">
+      플로우차트
+    </h4>
+  </div>
+  <div class="panel-footer panel-footer-links">
+    <a class="btn btn-link green" href="{% get_flowchart_link unit %}" target="_blank">
+      {% icon "link.svg" %}
+      링크
+    </a>
+  </div>
+</div>
+{% endif %}
+
 <div class="panel panel-default string-info">
   <div class="panel-heading">
   <h4 class="panel-title">
@@ -544,6 +560,7 @@
   </h4>
   </div>
   <div class="list-group">
+    {% comment %}
     {% with unit.source_info.screenshots.order as screenshots %}
     {% if screenshots or user_can_add_screenshot %}
     <div class="list-group-item">
@@ -558,6 +575,7 @@
     </div>
     {% endif %}
     {% endwith %}
+    {% endcomment %}
     {% if unit.explanation or user_can_edit_source %}
     <div class="list-group-item">
     <h5>

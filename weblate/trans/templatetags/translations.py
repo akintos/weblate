@@ -28,6 +28,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.html import escape
+from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext, gettext_lazy, ngettext, pgettext
 from siphashc import siphash
@@ -508,6 +509,38 @@ def get_state_flags(unit, detail=False):
         "unit": unit,
         "detail": detail,
     }
+
+
+@register.filter(name='is_bg3_dialog')
+def is_bg3_dialog(unit):
+    return unit.translation.component.project.slug == "bg3" and unit.translation.component.slug.startswith('dialog')
+
+
+@register.simple_tag
+def get_flowchart_link(unit):
+    """Return flowchart link."""
+    match = BG3SIM_LINK_RE.search(unit.note)
+    if not match:
+        return ""
+    node_id = match.group(1)
+
+    dialog_match = re.search(r"Dialog = ([^\n]+)\n", unit.note)
+    if not dialog_match:
+        return ""
+    dialog = dialog_match.group(1)
+
+    for location in unit.location.split(", "):
+        if dialog not in location:
+            continue
+        dialog_path = location.split(":")[0].replace(".lsj", ".json")
+        dialog_path = dialog_path.replace("Gustav/Mods/", "Mods/")
+        dialog_path = dialog_path.replace("Shared/Mods/", "Mods/")
+        
+        args = urlencode({"path": dialog_path, "node_id": node_id})
+        
+        return "https://bg3-dialog-flowchart.pages.dev/?{}".format(args)
+
+    return ""
 
 
 @register.simple_tag
