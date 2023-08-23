@@ -623,7 +623,7 @@ class Unit(models.Model, LoggerMixin):
         author = author or user
 
         # Commit possible previous changes on this unit
-        if self.pending:
+        if False:
             change_author = self.get_last_content_change()[0]
             if change_author != author:
                 self.translation.commit_pending("pending unit", user, force=True)
