@@ -184,9 +184,9 @@ def search(request, project=None, component=None, lang=None):
         search_form.is_valid()
         # Filter results by ACL
         if component:
-            units = Unit.objects.filter(translation__component=obj)
+            units = Unit.objects.filter(translation__component=obj).exclude(translation__check_flags="read-only")
         elif project:
-            units = Unit.objects.filter(translation__component__project=obj)
+            units = Unit.objects.filter(translation__component__project=obj).exclude(translation__check_flags="read-only")
         else:
             units = Unit.objects.filter_access(request.user)
         units = units.search(search_form.cleaned_data.get("q", "")).distinct()
