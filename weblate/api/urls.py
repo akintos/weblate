@@ -36,6 +36,8 @@ from weblate.api.views import (
     UserViewSet,
 )
 
+from weblate.api.views_custom import bg3_dialog, export_view
+
 # Routers provide an easy way of automatically determining the URL conf.
 router = WeblateRouter()
 router.register(r"users", UserViewSet)
@@ -51,9 +53,35 @@ router.register(r"units", UnitViewSet)
 router.register(r"screenshots", ScreenshotViewSet)
 
 
+# URL regexp for language code
+LANGUAGE = r"(?P<lang>[^/]+)"
+
+# URL regexp for project
+PROJECT = r"(?P<project>[^/]+)/"
+
+# URL regexp for component
+COMPONENT = PROJECT + r"(?P<component>[^/]+)/"
+
+# URL regexp for translations
+TRANSLATION = COMPONENT + LANGUAGE + "/"
+
+# URL regexp for project language pages
+PROJECT_LANG = PROJECT + LANGUAGE + "/"
+
+
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     url(r"^metrics/$", Metrics.as_view(), name="metrics"),
     url(r"^", include(router.urls)),
+    url(
+        r"^export/" + PROJECT_LANG + "$",
+        export_view,
+        name="export"
+    ),
+    url(
+        r"^bg3_dialog$",
+        bg3_dialog,
+        name="bg3_dialog"
+    )
 ]
