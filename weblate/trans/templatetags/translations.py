@@ -54,6 +54,10 @@ from weblate.utils.hash import hash_to_checksum
 from weblate.utils.markdown import render_markdown
 from weblate.utils.stats import BaseStats, ProjectLanguageStats
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from weblate.trans.models import Unit
+
 register = template.Library()
 
 HIGHLIGTH_SPACE = '<span class="hlspace">{}</span>{}'
@@ -96,6 +100,11 @@ SOURCE_LINK = """
     class="long-filename" dir="ltr">{1}</a>
 """
 
+WOTRSIM_LINK_RE = re.compile(r"Node = ([0-9a-f]{8})")
+WOTRSIM_LINK_RE_SUB = "Node = <a href=\"wotrsim://\g<1>\">\g<1></a>"
+
+BG3SIM_LINK_RE = re.compile(r"NodeID = ([0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12})")
+BG3SIM_LINK_RE_SUB = "Node = <a href=\"bg3sim://\g<1>\">\g<1></a>"
 
 def replace_whitespace(match):
     spaces = match.group(1).replace(" ", SPACE_SPACE)
@@ -212,6 +221,9 @@ def format_translation(
 
         # Normalize newlines
         value = NEWLINES_RE.sub("\n", value)
+
+        value = WOTRSIM_LINK_RE.sub(WOTRSIM_LINK_RE_SUB, value)
+        value = BG3SIM_LINK_RE.sub(BG3SIM_LINK_RE_SUB, value)
 
         # Split string
         paras = value.split("\n")
@@ -517,26 +529,12 @@ def is_bg3_dialog(unit):
 
 
 @register.simple_tag
-def get_flowchart_link(unit):
+def get_flowchart_link(unit: "Unit"):
     """Return flowchart link."""
-    match = BG3SIM_LINK_RE.search(unit.note)
-    if not match:
-        return ""
-    node_id = match.group(1)
-
-    dialog_match = re.search(r"Dialog = ([^\n]+)\n", unit.note)
-    if not dialog_match:
-        return ""
-    dialog = dialog_match.group(1)
 
     for location in unit.location.split(", "):
-        if dialog not in location:
-            continue
-        dialog_path = location.split(":")[0].replace(".lsj", ".json")
-        dialog_path = dialog_path.replace("Gustav/Mods/", "Mods/")
-        dialog_path = dialog_path.replace("Shared/Mods/", "Mods/")
-        
-        args = urlencode({"path": dialog_path, "node_id": node_id})
+        dialog_path, node_id = location.split(":")
+        args = urlencode({"path": dialog_path + ".json", "node_id": node_id})
         
         return "https://bg3-dialog-flowchart.pages.dev/?{}".format(args)
 
