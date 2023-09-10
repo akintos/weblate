@@ -47,7 +47,7 @@
             function(e) {$('input[name="fuzzy"]').prop('checked', false); return submitForm(e);}
         );
         Mousetrap.bindGlobal(
-            'mod+e',
+            'alt+e',
             () => {
                 this.$translationArea.get(0).focus();
                 return false;
@@ -84,14 +84,14 @@
             }
         );
 	    Mousetrap.bindGlobal(
-            'alt+q',
+            'mod+q',
             function(e) {
                 $('input[name="review"]').click();
 		        return submitForm(e);
             }
         );
 	    Mousetrap.bindGlobal(
-            'alt+e',
+            'mod+e',
             function(e) {
                 $('button[name="suggest"]').click();
 		        return false;
@@ -109,13 +109,32 @@
             }
         );
 	    Mousetrap.bindGlobal(
-            'alt+i',
+            ['alt+i', 'mod+i'],
             () => {
                 var editor = this.$translationArea.get(0);
+                if (editor.selectionStart < editor.selectionEnd) {
+                    editor.value = editor.value.substr(0, editor.selectionStart) + "<i>" + editor.value.substr(editor.selectionStart, editor.selectionEnd - editor.selectionStart) + "</i>" + editor.value.substr(editor.selectionEnd);
+                    return false;
+                }
                 var prevText = editor.value.substr(0, editor.selectionStart);
                 var openCount = (prevText.match(/<i>/g) || []).length;
                 var closeCount = (prevText.match(/<\/i>/g) || []).length;
                 this.$translationArea.insertAtCaret(openCount > closeCount ? "</i>" : "<i>").change()
+		        return false;
+            }
+        );
+	    Mousetrap.bindGlobal(
+            'mod+b',
+            () => {
+                var editor = this.$translationArea.get(0);
+                if (editor.selectionStart < editor.selectionEnd) {
+                    editor.value = editor.value.substr(0, editor.selectionStart) + "<b>" + editor.value.substr(editor.selectionStart, editor.selectionEnd - editor.selectionStart) + "</b>" + editor.value.substr(editor.selectionEnd);
+                    return false;
+                }
+                var prevText = editor.value.substr(0, editor.selectionStart);
+                var openCount = (prevText.match(/<b>/g) || []).length;
+                var closeCount = (prevText.match(/<\/b>/g) || []).length;
+                this.$translationArea.insertAtCaret(openCount > closeCount ? "</b>" : "<b>").change()
 		        return false;
             }
         );
