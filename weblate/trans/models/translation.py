@@ -57,6 +57,9 @@ from weblate.utils.render import render_template
 from weblate.utils.site import get_site_url
 from weblate.utils.stats import GhostStats, TranslationStats
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from weblate.trans.models import Component
 
 class TranslationManager(models.Manager):
     def check_sync(self, component, lang, code, path, force=False, request=None):
@@ -75,7 +78,7 @@ class TranslationManager(models.Manager):
             translation.language_code = code
             translation.save(update_fields=["filename", "language_code"])
         flags = ""
-        if not component.edit_template and translation.is_template:
+        if code == "ko_mt" or (not component.edit_template and translation.is_template):
             flags = "read-only"
         if translation.check_flags != flags:
             force = True
@@ -184,7 +187,7 @@ class Translation(models.Model, URLMixin, LoggerMixin):
 
     @cached_property
     def is_readonly(self):
-        return "read-only" in self.all_flags
+        return self.language_code == "ko_mt" or "read-only" in self.all_flags
 
     def clean(self):
         """Validate that filename exists and can be opened using translate-toolkit."""
@@ -602,11 +605,6 @@ class Translation(models.Model, URLMixin, LoggerMixin):
         """Update backend file and unit."""
         updated = False
         for unit in self.unit_set.filter(pending=True).select_for_update():
-            # Skip changes by other authors
-            change_author = unit.get_last_content_change()[0]
-            if change_author.id != author_id:
-                continue
-
             # Remove pending flag
             unit.pending = False
 
@@ -771,6 +769,7 @@ class Translation(models.Model, URLMixin, LoggerMixin):
         add_fuzzy = method == "fuzzy"
         add_approve = method == "approve"
 
+        unit: Unit
         for set_fuzzy, unit2 in store2.iterate_merge(fuzzy):
             try:
                 unit = self.unit_set.get_unit(unit2)
@@ -803,7 +802,7 @@ class Translation(models.Model, URLMixin, LoggerMixin):
             #   can't obtain the lock
             unit.translate(
                 request.user,
-                split_plural(unit2.target),
+                unit2.target, # split_plural(unit2.target),
                 state,
                 change_action=Change.ACTION_UPLOAD,
                 propagate=False,

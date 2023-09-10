@@ -208,8 +208,8 @@ class Project(FastDeleteMixin, models.Model, URLMixin, PathMixin):
             )
 
         # Update translation memory on enabled sharing
-        if update_tm:
-            transaction.on_commit(lambda: import_memory.delay(self.id))
+        # if update_tm:
+        #     transaction.on_commit(lambda: import_memory.delay(self.id))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

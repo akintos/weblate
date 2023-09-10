@@ -63,7 +63,7 @@ except locale.Error:
 
 def is_plural(text):
     """Check whether string is plural form."""
-    return text.find(PLURAL_SEPARATOR) != -1
+    return False # text.find(PLURAL_SEPARATOR) != -1
 
 
 def split_plural(text):

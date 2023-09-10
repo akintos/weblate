@@ -123,7 +123,7 @@ class UnitQuerySet(models.QuerySet):
             "position",
             "context",
             "num_words",
-            "labels",
+            # "labels",
             "timestamp",
         ]
         countable_sort_choices = {
@@ -145,15 +145,10 @@ class UnitQuerySet(models.QuerySet):
                     countable_sort_choices[unsigned_choice]["filter"],
                 )
             if unsigned_choice in available_sort_choices:
-                if unsigned_choice == "labels":
-                    choice = choice.replace("labels", "max_labels_name")
                 sort_list.append(choice)
         if not sort_list:
             return self.order()
-        if "max_labels_name" in sort_list or "-max_labels_name" in sort_list:
-            return self.annotate(max_labels_name=Max("labels__name")).order_by(
-                *sort_list
-            )
+        
         return self.order_by(*sort_list)
 
     def order_by_count(self, choice, filter):
@@ -171,21 +166,26 @@ class UnitQuerySet(models.QuerySet):
         source = ttunit.source
         context = ttunit.context
 
-        params = [{"source": source, "context": context}, {"source": source}]
-        # Try empty context first before matching any context
-        if context != "":
-            params.insert(1, {"source": source, "context": ""})
-        # Special case for XLIFF
-        if "///" in context:
-            params.insert(1, {"source": source, "context": context.split("///", 1)[1]})
+        # params = [{"source": source, "context": context}, {"source": source}]
+        # # Try empty context first before matching any context
+        # if context != "":
+        #     params.insert(1, {"source": source, "context": ""})
+        # # Special case for XLIFF
+        # if "///" in context:
+        #     params.insert(1, {"source": source, "context": context.split("///", 1)[1]})
 
-        for param in params:
-            try:
-                return self.get(**param)
-            except (Unit.DoesNotExist, Unit.MultipleObjectsReturned):
-                continue
+        # for param in params:
+        #     try:
+        #         return self.get(**param)
+        #     except (Unit.DoesNotExist, Unit.MultipleObjectsReturned):
+        #         continue
 
-        raise Unit.DoesNotExist("No matching unit found!")
+        # raise Unit.DoesNotExist("No matching unit found!")
+
+        try:
+            return self.get(context=context)
+        except (Unit.DoesNotExist, Unit.MultipleObjectsReturned):
+            Unit.DoesNotExist("No matching unit found!")
 
     def order(self):
         return self.order_by("-priority", "position")
@@ -257,7 +257,7 @@ class Unit(models.Model, LoggerMixin):
         "Label", verbose_name=gettext_lazy("Labels"), blank=True
     )
 
-    objects = UnitQuerySet.as_manager()
+    objects: UnitQuerySet = UnitQuerySet.as_manager()
 
     class Meta:
         app_label = "trans"
@@ -444,7 +444,7 @@ class Unit(models.Model, LoggerMixin):
                     same_content=True,
                     same_state=True,
                 )
-            self.explanation = source_info.explanation
+            # self.explanation = source_info.explanation
             self.extra_flags = source_info.extra_flags
             self.__dict__["source_info"] = source_info
 
@@ -522,8 +522,8 @@ class Unit(models.Model, LoggerMixin):
         if self.translation.is_template:
             component.updated_sources[self.id_hash] = self
         # Update unit labels
-        if not self.translation.is_source:
-            self.labels.set(self.source_info.labels.all())
+        # if not self.translation.is_source:
+        #     self.labels.set(self.source_info.labels.all())
         # Indicate source string change
         if not same_source and previous_source:
             Change.objects.create(
@@ -567,7 +567,7 @@ class Unit(models.Model, LoggerMixin):
 
     def is_plural(self):
         """Check whether message is plural."""
-        return is_plural(self.source) or is_plural(self.target)
+        return False # is_plural(self.source) or is_plural(self.target)
 
     def get_source_plurals(self):
         """Return source plurals in array."""
@@ -630,8 +630,8 @@ class Unit(models.Model, LoggerMixin):
 
         # Propagate to other projects
         # This has to be done before changing source/content_hash for template
-        if propagate:
-            self.propagate(user, change_action, author=author)
+        # if propagate:
+        #     self.propagate(user, change_action, author=author)
 
         # Return if there was no change
         # We have to explicitly check for fuzzy flag change on monolingual
@@ -799,6 +799,9 @@ class Unit(models.Model, LoggerMixin):
         create = []
 
         if self.translation.is_source:
+            Check.objects.filter(unit=self).delete() # skip source checks
+            return
+        
             checks = CHECKS.source
             meth = "check_source"
             args = src, self
@@ -905,10 +908,6 @@ class Unit(models.Model, LoggerMixin):
             self.target = join_plural(new_target)
             not_empty = bool(max(new_target))
 
-        # Newlines fixup
-        if "dos-eol" in self.all_flags:
-            self.target = NEWLINES.sub("\r\n", self.target)
-
         if not_empty:
             self.state = new_state
         else:
@@ -927,13 +926,13 @@ class Unit(models.Model, LoggerMixin):
             self.state = self.original_state = STATE_FUZZY
             self.save(same_state=True, same_content=True, update_fields=["state"])
 
-        if (
-            propagate
-            and user
-            and self.target != self.old_unit.target
-            and self.state >= STATE_TRANSLATED
-        ):
-            update_memory(user, self)
+        # if (
+        #     propagate
+        #     and user
+        #     and self.target != self.old_unit.target
+        #     and self.state >= STATE_TRANSLATED
+        # ):
+        #     update_memory(user, self)
 
         return saved
 

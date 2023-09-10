@@ -260,7 +260,7 @@ class BaseStats:
 
     def calculate_percents(self, item, total=None):
         """Calculate percent value for given item."""
-        base = item[:-8]
+        base = item[:-8] # remove _percent
         if total is None:
             if base.endswith("_words"):
                 total = self.all_words
@@ -272,6 +272,11 @@ class BaseStats:
             completed = {"approved", "approved_words", "approved_chars"}
         else:
             completed = {"translated", "translated_words", "translated_chars"}
+
+        # translated = getattr(self, base)
+        # if base.startswith("translated"):
+        #     translated += getattr(self, base.replace("translated", "approved"))
+        
         return translation_percent(getattr(self, base), total, base in completed)
 
     def store_percents(self, item, total=None):
@@ -627,7 +632,8 @@ class ComponentStats(LanguageStats):
 
     def get_language_stats(self):
         yield from (
-            TranslationStats(translation) for translation in self.translation_set
+            TranslationStats(translation) for translation in self.translation_set 
+            if not translation.is_readonly
         )
 
     def get_single_language_stats(self, language):
@@ -717,6 +723,8 @@ class ProjectStats(BaseStats):
     def get_language_stats(self):
         result = []
         for language in self._object.languages:
+            if language == self._object.source_language:
+                continue
             result.append(self.get_single_language_stats(language, prefetch=True))
         return prefetch_stats(result)
 

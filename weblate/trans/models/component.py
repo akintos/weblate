@@ -1702,7 +1702,7 @@ class Component(FastDeleteMixin, models.Model, URLMixin, PathMixin):
             self.update_variants()
             component_post_update.send(sender=self.__class__, component=self)
             # Update translation memory
-            transaction.on_commit(lambda: import_memory.delay(self.project_id, self.id))
+            # transaction.on_commit(lambda: import_memory.delay(self.project_id, self.id))
 
         self.log_info("updating completed")
         return was_change
