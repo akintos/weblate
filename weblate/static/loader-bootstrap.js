@@ -427,6 +427,7 @@ $(function () {
         if (activeTab.length) {
             activeTab.tab('show');
         }
+        window.scrollTo(0, 0);
     }
 
     /* Add a hash to the URL when the user clicks on a tab */
