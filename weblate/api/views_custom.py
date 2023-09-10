@@ -134,3 +134,26 @@ def bg3_dialog(request):
 
     cache.set(cache_key, result, BG3_DIALOG_CACHE_LIFETIME)
     return Response(result)
+
+
+@api_view(['POST'])
+def bg3_quest(request):
+    user: User = request.user
+    if user.is_anonymous:
+        raise NotAuthenticated({"message": "This api requires authenticaiton"})
+    
+    bg3_proj: Project = Project.objects.get(slug="bg3")
+    if not request.user.can_access_project(bg3_proj):
+        raise PermissionDenied({
+            "message":"You don't have permission to access the project",
+            "project": "bg3"})
+    
+    journal = bg3_proj.component_set.get(slug="journal")
+    
+    units = Unit.objects.filter(
+        translation__component=journal,
+        translation__language__code="ko",
+    )
+
+    result = serialize_unit_queryset(units)
+    return Response(result)

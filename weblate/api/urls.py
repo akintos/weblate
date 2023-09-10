@@ -36,7 +36,7 @@ from weblate.api.views import (
     UserViewSet,
 )
 
-from weblate.api.views_custom import bg3_dialog, export_view
+from weblate.api.views_custom import bg3_dialog, bg3_quest, export_view
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = WeblateRouter()
@@ -83,5 +83,10 @@ urlpatterns = [
         r"^bg3_dialog$",
         bg3_dialog,
         name="bg3_dialog"
-    )
+    ),
+    url(
+        r"^bg3_quest$",
+        bg3_quest,
+        name="bg3_quest"
+    ),
 ]
