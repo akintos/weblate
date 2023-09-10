@@ -188,7 +188,7 @@ def search(request, project=None, component=None, lang=None):
         elif project:
             units = Unit.objects.filter(translation__component__project=obj).exclude(translation__check_flags="read-only")
         else:
-            units = Unit.objects.filter_access(request.user)
+            units = Unit.objects.exclude(translation__check_flags="read-only").filter_access(request.user)
         units = units.search(search_form.cleaned_data.get("q", "")).distinct()
         if lang:
             units = units.filter(translation__language=context["language"])
