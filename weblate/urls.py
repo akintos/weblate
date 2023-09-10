@@ -191,27 +191,27 @@ real_patterns = [
     url(r"^zen/" + TRANSLATION + "$", weblate.trans.views.edit.zen, name="zen"),
     url(
         r"^download/" + TRANSLATION + "$",
-        weblate.trans.views.files.download_translation,
+        management_access(weblate.trans.views.files.download_translation),
         name="download_translation",
     ),
     url(
         r"^download/" + COMPONENT + "$",
-        weblate.trans.views.files.download_component,
+        management_access(weblate.trans.views.files.download_component),
         name="download_component",
     ),
     url(
         r"^download/" + PROJECT + "$",
-        weblate.trans.views.files.download_project,
+        management_access(weblate.trans.views.files.download_project),
         name="download_project",
     ),
     url(
         r"^download-list/(?P<name>[^/]*)/$",
-        weblate.trans.views.files.download_component_list,
+        management_access(weblate.trans.views.files.download_component_list),
         name="download_component_list",
     ),
     url(
         r"^download-language/" + LANGUAGE + "/" + PROJECT + "$",
-        weblate.trans.views.files.download_lang_project,
+        management_access(weblate.trans.views.files.download_lang_project),
         name="download_lang_project",
     ),
     url(
