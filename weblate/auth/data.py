@@ -62,6 +62,8 @@ PERMISSIONS = (
     ("project.edit", _("Edit project settings")),
     # Translators: Permission name
     ("project.permissions", _("Manage project access")),
+
+    ("project.download", "Download translation"),
     # Translators: Permission name
     ("reports.view", _("Download reports")),
     # Translators: Permission name
@@ -160,8 +162,8 @@ TRANSLATE_PERMS = {
     "suggestion.vote",
     "unit.check",
     "unit.edit",
-    "upload.overwrite",
-    "upload.perform",
+    # "upload.overwrite",
+    # "upload.perform",
     "machinery.view",
     "memory.view",
 }
@@ -204,6 +206,7 @@ ROLES = (
     (pgettext("Access control role", "Manage repository"), filter_perms("vcs.")),
     (pgettext("Access control role", "Administration"), [x[0] for x in PERMISSIONS]),
     (pgettext("Access control role", "Billing"), filter_perms("billing.")),
+    (pgettext("Access control role", "Download translation"), {"project.download"}),
 )
 
 # Default set of roles for groups
@@ -222,13 +225,15 @@ GROUPS = (
 # Per project group definitions
 ACL_GROUPS = {
     pgettext("Per project access control group", "Translate"): "Translate",
-    pgettext("Per project access control group", "Template"): "Edit source",
-    pgettext("Per project access control group", "Languages"): "Manage languages",
-    pgettext("Per project access control group", "Glossary"): "Manage glossary",
-    pgettext("Per project access control group", "Memory"): "Manage translation memory",
-    pgettext("Per project access control group", "Screenshots"): "Manage screenshots",
+    # pgettext("Per project access control group", "Template"): "Edit source",
+    # pgettext("Per project access control group", "Languages"): "Manage languages",
+    # pgettext("Per project access control group", "Glossary"): "Manage glossary",
+    # pgettext("Per project access control group", "Memory"): "Manage translation memory",
+    # pgettext("Per project access control group", "Screenshots"): "Manage screenshots",
     pgettext("Per project access control group", "Review"): "Review strings",
-    pgettext("Per project access control group", "VCS"): "Manage repository",
+    # pgettext("Per project access control group", "VCS"): "Manage repository",
     pgettext("Per project access control group", "Administration"): "Administration",
     pgettext("Per project access control group", "Billing"): "Billing",
+    "Suggest": "Add suggestion",
+    "Download": "Download translation",
 }
