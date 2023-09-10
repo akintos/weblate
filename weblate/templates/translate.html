@@ -540,11 +540,22 @@
 <div class="panel panel-default">
   <div class="panel-heading">
     <h4 class="panel-title">
+      대사 음성
+    </h4>
+  </div>
+  <div class="panel-footer panel-footer-links">
+    <audio src="/bg3_voice/{{ unit.context }}.mp3" preload="metadata" controls></audio>
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h4 class="panel-title">
       플로우차트
     </h4>
   </div>
   <div class="panel-footer panel-footer-links">
-    <a class="btn btn-link green" href="{% get_flowchart_link unit %}" target="_blank">
+    <a class="btn btn-link green" href="{% get_flowchart_link unit %}" target="bg3-flowchart">
       {% icon "link.svg" %}
       링크
     </a>
