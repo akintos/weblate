@@ -24,7 +24,7 @@ from itertools import islice
 
 from django.conf import settings
 from django.db import models
-from django.db.models import Q
+from django.db.models import Value, F, Q, CharField
 from django.db.models.functions import Lower
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -166,6 +166,21 @@ class TermQuerySet(models.QuerySet):
 
     def get_terms(self, unit):
         """Return list of term pairs for an unit."""
+        sql = (
+            "SELECT gt.* "
+            "FROM glossary_term gt "
+            "LEFT JOIN glossary_glossary gg ON gt.glossary_id = gg.id "
+            "WHERE gg.project_id = %s AND %s ILIKE '%%'||gt.source||'%%';"
+        )
+        # return self.raw(sql, [unit.translation.component.project.id, unit.source])
+    
+        return self.filter(
+                        glossary__project=unit.translation.component.project.id, 
+                        language=unit.translation.language
+                    ).annotate(
+                        querystring=Value(unit.source, output_field=CharField())
+                    ).filter(querystring__icontains=F('source'))
+
         words = set()
         source_language = unit.translation.component.project.source_language
 
