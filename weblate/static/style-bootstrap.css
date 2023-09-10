@@ -147,6 +147,7 @@ textarea#id_comment {
     color: #BFC3C7;
     white-space: pre;
     display: inline-block;
+    opacity: 0.5;
 }
 .space-tab:before {
     content: "→";
@@ -796,6 +797,7 @@ svg {
 }
 .source-info, .source-info h5 {
     font-size: 14px;
+    line-break: anywhere;
 }
 .source-info .list-group-item {
     padding: 15px;
