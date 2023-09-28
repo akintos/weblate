@@ -1160,9 +1160,9 @@ real_patterns = [
     ),
     url(
         r"^site\.webmanifest$",
-        TemplateView.as_view(
+        cache_page(60*60)(TemplateView.as_view(
             template_name="site.webmanifest", content_type="application/json"
-        ),
+        )),
     ),
 ]
 
