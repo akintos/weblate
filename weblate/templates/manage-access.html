@@ -13,6 +13,21 @@
 {% block content %}
 
 {% if object.access_control != object.ACCESS_CUSTOM %}
+<form action="{% url "add-user" project=object.slug %}" method="post">
+  {% csrf_token %}
+  <div class="panel panel-default">
+    <div class="panel-heading"><h4 class="panel-title">
+    {% trans "Add a user" %}
+    </h4></div>
+    <div class="panel-body">
+      {{ add_user_form|crispy }}
+    </div>
+    <div class="panel-footer">
+    <input type="submit" class="btn btn-primary" value="{% trans "Add" %}" />
+    </div>
+  </div>
+</form>
+
 <div class="panel panel-default">
   <div class="panel-heading"><h4 class="panel-title">
     {% documentation_icon 'admin/access' 'groups' right=True %}
@@ -69,22 +84,8 @@
 {% csrf_token %}
 </form>
 
-<div class="row">
+{% comment %} <div class="row">
 <div class="col-sm-6">
-<form action="{% url "add-user" project=object.slug %}" method="post">
-{% csrf_token %}
-<div class="panel panel-default">
-  <div class="panel-heading"><h4 class="panel-title">
-  {% trans "Add a user" %}
-  </h4></div>
-  <div class="panel-body">
-    {{ add_user_form|crispy }}
-  </div>
-  <div class="panel-footer">
-  <input type="submit" class="btn btn-primary" value="{% trans "Add" %}" />
-  </div>
-</div>
-</form>
 </div>
 <div class="col-sm-6">
 <form action="{% url "invite-user" project=object.slug %}" method="post">
@@ -102,7 +103,7 @@
 </div>
 </form>
 </div>
-</div>
+</div> {% endcomment %}
 {% else %}
 <div class="panel panel-default">
   <div class="panel-heading"><h4 class="panel-title">
