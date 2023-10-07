@@ -40,6 +40,7 @@ from weblate.trans.models import Change, Unit
 from weblate.trans.util import render
 from weblate.utils import messages
 from weblate.utils.ratelimit import check_rate_limit
+from weblate.utils.state import STATE_READONLY
 from weblate.utils.views import (
     get_component,
     get_paginator,
@@ -90,7 +91,7 @@ def search_replace(request, project, component=None, lang=None):
     search_text = form.cleaned_data["search"]
     replacement = form.cleaned_data["replacement"]
 
-    matching = unit_set.filter(target__contains=search_text)
+    matching = unit_set.filter(target__contains=search_text).exclude(state=STATE_READONLY)
 
     updated = 0
     if matching.exists():
