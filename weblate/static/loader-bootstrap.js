@@ -962,3 +962,13 @@ $(function () {
                 );
     console.log("%cPlease close this window now.", "color: blue;");
 });
+
+
+$(function () {
+    $('a.btn-replace-selectall').click(function() {
+        $('input.replace-confirm').prop("checked", true);
+    });
+    $('a.btn-replace-deselectall').click(function() {
+        $('input.replace-confirm').prop("checked", false);
+    });
+});

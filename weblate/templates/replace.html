@@ -24,6 +24,11 @@
 {% show_message "warning" msg %}
 {% endif %}
 
+<div class="panel">
+<a class="btn-replace-selectall btn btn-primary">모두 선택</a>&nbsp;&nbsp;
+<a class="btn-replace-deselectall btn btn-primary">모두 선택 해제</a>
+</div>
+
 <form method="POST">
 {% csrf_token %}
 {{ form.search.as_hidden }}
@@ -34,7 +39,7 @@
 {% for unit in matching %}
 <tr>
 <td rowspan="3">
-<input type="checkbox" name="units" checked="1" value="{{ unit.pk }}" id="confirm_{{ unit.pk }}" />
+<input class="replace-confirm" type="checkbox" name="units" checked="1" value="{{ unit.pk }}" id="confirm_{{ unit.pk }}" />
 </td>
 <td>
 <a href="{{ unit.get_absolute_url }}" class="btn btn-link btn-xs" title="{% trans "Edit" %}">{% icon "pencil.svg" %}</a>
