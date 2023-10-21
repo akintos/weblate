@@ -28,6 +28,10 @@ from weblate.trans.models.change import Change
 from weblate.trans.util import redirect_param
 from weblate.utils.views import get_component, get_project, show_form_errors
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from weblate.auth.models import User
+
 # Header, two longer fields for name and email, shorter fields for numbers
 RST_HEADING = " ".join(["=" * 40] * 2 + ["=" * 24] * 20)
 
@@ -171,14 +175,25 @@ def generate_counts(user, start_date, end_date, **kwargs):
     changes = base.filter(
         timestamp__range=(start_date, end_date), **kwargs
     ).prefetch_related("author", "unit")
+
+    change: Change
     for change in changes:
-        email = change.author.email
+        author: User = change.author # type: ignore
+        email = author.email
 
         if email not in result:
-            result[email] = current = {"name": change.author.full_name, "email": email}
+            result[email] = current = {
+                "name": author.full_name, 
+                "email": email,
+                "last_login": author.last_login,
+                "last_change": change.timestamp,
+            }
             current.update(COUNT_DEFAULTS)
         else:
             current = result[email]
+
+        if change.timestamp > current["last_change"]:
+            current["last_change"] = change.timestamp
 
         src_chars = len(change.unit.source)
         src_words = change.unit.num_words
@@ -238,6 +253,8 @@ def get_counts(request, project=None, component=None):
     headers = (
         "Name",
         "Email",
+        "Last login",
+        "Last change",
         "Count total",
         "Edits total",
         "Source words total",
@@ -296,6 +313,8 @@ def get_counts(request, project=None, component=None):
                 (
                     cell_name.format(item["name"] or "Anonymous"),
                     cell_name.format(item["email"] or ""),
+                    cell_name.format(item["last_login"].astimezone().strftime("%Y-%m-%d %H:%M:%S")),
+                    cell_name.format(item["last_change"].astimezone().strftime("%Y-%m-%d %H:%M:%S")),
                     cell_count.format(item["count"]),
                     cell_count.format(item["edits"]),
                     cell_count.format(item["words"]),
