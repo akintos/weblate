@@ -20,12 +20,14 @@
 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from weblate.lang.models import Language
 from weblate.trans.forms import ReportsForm
 from weblate.trans.models.change import Change
 from weblate.trans.util import redirect_param
+from weblate.utils.site import get_site_url
 from weblate.utils.views import get_component, get_project, show_form_errors
 
 from typing import TYPE_CHECKING
@@ -185,6 +187,8 @@ def generate_counts(user, start_date, end_date, **kwargs):
             result[email] = current = {
                 "name": author.full_name, 
                 "email": email,
+                "username": author.username,
+                "profile_url": get_site_url(reverse("user_page", kwargs={"user": author.username})),
                 "last_login": author.last_login,
                 "last_change": change.timestamp,
             }
@@ -253,6 +257,8 @@ def get_counts(request, project=None, component=None):
     headers = (
         "Name",
         "Email",
+        "Username",
+        "Profile URL",
         "Last login",
         "Last change",
         "Count total",
@@ -313,6 +319,8 @@ def get_counts(request, project=None, component=None):
                 (
                     cell_name.format(item["name"] or "Anonymous"),
                     cell_name.format(item["email"] or ""),
+                    cell_name.format(item["username"] or ""),
+                    cell_name.format(item["profile_url"] or ""),
                     cell_name.format(item["last_login"].astimezone().strftime("%Y-%m-%d %H:%M:%S")),
                     cell_name.format(item["last_change"].astimezone().strftime("%Y-%m-%d %H:%M:%S")),
                     cell_count.format(item["count"]),
