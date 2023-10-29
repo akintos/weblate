@@ -578,6 +578,8 @@ class LanguageStats(BaseStats):
     def _prefetch_basic(self):
         stats = zero_stats(self.basic_keys)
         for translation in self.translation_set:
+            if translation.is_readonly:
+                continue
             stats_obj = translation.stats
             stats_obj.ensure_basic()
             for item in BASIC_KEYS:
@@ -597,6 +599,8 @@ class LanguageStats(BaseStats):
         """Calculate stats for translation."""
         result = 0
         for translation in self.translation_set:
+            if translation.is_readonly:
+                continue
             result += getattr(translation.stats, item)
         self.store(item, result)
 
