@@ -171,7 +171,7 @@ PERCENT_MATCH = re.compile(r"(%([a-zA-Z0-9_]+)%)")
 
 WHITESPACE = re.compile(r"\s+")
 
-ENCYCLOPEDIA_MATCH = re.compile(r"{g\|Encyclopedia:[A-Za-z_]+}([^{]+){/g}")
+ENCYCLOPEDIA_MATCH = re.compile(r"{g\|[A-Za-z_:]+}([^{]+){/g}")
 
 
 def c_format_is_position_based(string):
